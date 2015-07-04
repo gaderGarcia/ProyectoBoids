@@ -190,9 +190,10 @@ var update = function(){
         dy=boids[i].v.y;
 
         for (var j = 0; j < obstacles.length; j++){
-            if (calculateDistance(boids[i], obstacles[j]) < 75) {
-                boids[i].x -= 5;
-                boids[i].y -= 5;
+            if (calculateDistance(boids[i], obstacles[j]) < 40) {
+                var dx=boids[i].v.x * speed, dy=boids[i].v.y * speed;
+                boids[i].x -= dx;
+                boids[i].y -= dy;
                 boids[i].v.x = Math.random() * 2 - 1;
                 boids[i].v.y = Math.random() * 2 - 1;
                 applyForces(i);
@@ -217,7 +218,7 @@ var update = function(){
 var clearCanvas = function(){
     ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
     ctx.beginPath();
-    ctx.rect(0, 0, width, height);
+    ctx.rect(0, 0, window.innerWidth , window.innerHeight );
     ctx.closePath();
     ctx.fill();
 };
