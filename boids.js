@@ -47,18 +47,33 @@ function getMousePos(canvas, evt) {
 }
 
 var checkWallCollisions = function(index){
-    if (boids[index].x > width) {
-        boids[index].x = 0;
+    if(boids[index].x > width - 10){
+        boids[index].x = width - 5;
+        boids[index].v.x = Math.random() * 2 - 1;
+        boids[index].v.y = Math.random() * 2 - 1;
+        applyForces(index);
+        
     }
-    else if (boids[index].x < 0) {
-        boids[index].x = width;
+    if(boids[index].x < 5){
+        boids[index].x =  5;
+        boids[index].v.x = Math.random() * 2 - 1;
+        boids[index].v.y = Math.random() * 2 - 1;
+        applyForces(index);
+        
     }
-
-    if (boids[index].y > height) {
-        boids[index].y = 0;
+    if(boids[index].y > height - 10){
+        boids[index].y = height - 5;
+        boids[index].v.x = Math.random() * 2 - 1;
+        boids[index].v.y = Math.random() * 2 - 1;
+        applyForces(index);
+        
     }
-    else if (boids[index].y < 0) {
-        boids[index].y = height;
+    if(boids[index].y < 5){
+        boids[index].y =  5;
+        boids[index].v.x = Math.random() * 2 - 1;
+        boids[index].v.y = Math.random() * 2 - 1;
+        applyForces(index);
+        
     }
 };
 
