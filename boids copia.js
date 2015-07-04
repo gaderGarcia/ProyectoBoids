@@ -1,5 +1,7 @@
-
-var width = window.innerWidth - 100, height = window.innerHeight - 100, timerID = 0, c2 = document.getElementById('c'), ctx = c2.getContext('2d');
+// forked from rekcah5's "forked: Flocking Boids" http://jsdo.it/rekcah5/wFcC
+// forked from sylvain.pollet.villard's "forked: Flocking Boids" http://jsdo.it/sylvain.pollet.villard/6qe1
+// forked from tholman's "Flocking Boids" http://jsdo.it/tholman/eVUR
+var width = window.innerWidth - 40, height = window.innerHeight - 40, timerID = 0, c2 = document.getElementById('c'), ctx = c2.getContext('2d');
 c2.width = width;
 c2.height = height;
 
@@ -7,14 +9,18 @@ var speed = 6;
 var boids = [];
 var totalBoids = 100;
 var obstacles = [];
+var blocksWall = [];
 
 var init = function(){
+
+    //draw stage
+    drawStructure();
 
     for (var i = 0; i < totalBoids; i++) {
 
         boids.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
+            x: width / 2,
+            y: height /2,
             v: {
               x: Math.random() * 2 - 1,
               y: Math.random() * 2 - 1
@@ -22,6 +28,8 @@ var init = function(){
           c: 'rgb(' + Math.floor(0 * 255) + ',' + Math.floor(0 * 255) + ',' + Math.floor(0 * 255) + ')'
         });
     }
+
+
     setInterval(update, 40);
 };
 
@@ -32,11 +40,51 @@ var calculateDistance = function(v1, v2){
     return Math.sqrt((x * x) + (y * y));
 };
 
+function drawStructure(){
+    var stdRecWidth = 600;
+    var x1 = width/2;
+    var y1 = height/2;
 
-function drawRectangle(){
-    ctx.rect(0,0, width, height);
-    ctx.stroke();
+    var x2 = x1-stdRecWidth/2;
+    var y2 = y1-stdRecWidth/2;
+
+    var x3 = x1+stdRecWidth/2;
+    var y3 = y1+stdRecWidth/2;
+
+    //iterate to draw pixel by pixel
+    var x=0;
+    var y=0;
+    for(var i=0; i < stdRecWidth; i++){
+
+        ctx.fillStyle = "#F00";
+        ctx.fillRect(x2+x,y2, 1, 1);
+        //adding blockto Wall
+        blocksWall.push({
+            x: x2+x,
+            y: y2
+        });
+        ctx.fillRect(x3-x,y3, 1, 1);
+        blocksWall.push({
+            x: x3-x,
+            y: y3
+        });
+        x+=1;
+        ctx.fillStyle = "#F00";
+        ctx.fillRect(x2,y2+y, 1, 1);
+        blocksWall.push({
+            x: x2,
+            y: y2+y
+        });
+        ctx.fillRect(x3,y3-y, 1, 1);
+        blocksWall.push({
+            x: x3,
+            y: y3-y
+        });
+        y+=1;
+
+    }
 }
+
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect(), root = document.documentElement;
 
@@ -50,33 +98,18 @@ function getMousePos(canvas, evt) {
 }
 
 var checkWallCollisions = function(index){
-    if(boids[index].x > width - 10){
-        boids[index].x = width - 5;
-        boids[index].v.x = Math.random() * 2 - 1;
-        boids[index].v.y = Math.random() * 2 - 1;
-        applyForces(index);
-        
+    if (boids[index].x > width) {
+        boids[index].x = 0;
     }
-    if(boids[index].x < 5){
-        boids[index].x =  5;
-        boids[index].v.x = Math.random() * 2 - 1;
-        boids[index].v.y = Math.random() * 2 - 1;
-        applyForces(index);
-        
+    else if (boids[index].x < 0) {
+        boids[index].x = width;
     }
-    if(boids[index].y > height - 10){
-        boids[index].y = height - 5;
-        boids[index].v.x = Math.random() * 2 - 1;
-        boids[index].v.y = Math.random() * 2 - 1;
-        applyForces(index);
-        
+
+    if (boids[index].y > height) {
+        boids[index].y = 0;
     }
-    if(boids[index].y < 5){
-        boids[index].y =  5;
-        boids[index].v.x = Math.random() * 2 - 1;
-        boids[index].v.y = Math.random() * 2 - 1;
-        applyForces(index);
-        
+    else if (boids[index].y < 0) {
+        boids[index].y = height;
     }
 };
 
@@ -167,11 +200,11 @@ var update = function(){
 
     clearCanvas();
     $('#h1').html( totalBoids );
-    drawRectangle();    
+    drawStructure();
 
-    for(var j=0; j< obstacles.length; j++){
+    /*for(var j=0; j< obstacles.length; j++){
         obstacles[j].draw(ctx);
-    }
+    }*/
 
     for (var i = 0; i < boids.length; i++) {
 
@@ -189,15 +222,13 @@ var update = function(){
         dx=boids[i].v.x;
         dy=boids[i].v.y;
 
-        for (var j = 0; j < obstacles.length; j++){
-            if (calculateDistance(boids[i], obstacles[j]) < 75) {
-                boids[i].x -= 5;
-                boids[i].y -= 5;
+        /*for (var j = 0; j < blocksWall.length; j++){
+            if (calculateDistance(boids[i], blocksWall[j]) < 10) {
                 boids[i].v.x = Math.random() * 2 - 1;
                 boids[i].v.y = Math.random() * 2 - 1;
-                applyForces(i);
+                //applyForces(i);
             }
-        }
+        }*/
 
         ctx.moveTo(oldx+dx, oldy+dy);
         ctx.lineTo(oldx-dy, oldy+dx);
@@ -238,16 +269,6 @@ $('#c').click(function(e){
 $('html').keyup(function(e){
     var code = e.keyCode;
     if (code == 38){
-        width -=5;
-        height-=5;
-        if(width<15)
-            width = window.innerWidth - 100;
-        if(height<15)
-            height = window.innerHeight - 100;
-    }
-    
-    /*var code = e.keyCode;
-    if (code == 38){
         speed = speed + 1;
     }
     else if (code == 40){
@@ -258,7 +279,7 @@ $('html').keyup(function(e){
            boids[i].v.x = Math.random() * 2 - 1;
            boids[i].v.y = Math.random() * 2 - 1;
        }
-   }*/
+   }
 });
 
 //creating Obstacle
@@ -293,7 +314,7 @@ function findPos(obj) {
     }
     return undefined;
 }
-
+/*
 $('#c').mousemove(function(e) {
     var pos = findPos(this);
     var mousePos = new Object();
@@ -307,4 +328,10 @@ $('#c').mousemove(function(e) {
         }
     }
 
-});
+});*/
+
+
+
+
+
+
