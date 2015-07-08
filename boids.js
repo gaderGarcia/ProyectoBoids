@@ -5,6 +5,7 @@ c2.height = height;
 
 var speed = 6;
 var boids = [];
+var doors = [];
 var totalBoids = 100;
 var obstacles = [];
 
@@ -34,9 +35,14 @@ var calculateDistance = function(v1, v2){
 
 
 function drawRectangle(){
+    ctx.beginPath();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = "1";
     ctx.rect(0,0, width, height);
     ctx.stroke();
+
 }
+
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect(), root = document.documentElement;
 
@@ -50,6 +56,13 @@ function getMousePos(canvas, evt) {
 }
 
 var checkWallCollisions = function(index){
+    for(var j=0; j< doors.length; j++){
+        if(((boids[index].y >= doors[j].y-5 && doors[j].type == 'H' && boids[index].x <= doors[j].x && boids[index].x >= doors[j].x-50) 
+            || (boids[index].x >= doors[j].x-5 && doors[j].type == 'V' && boids[index].y <= doors[j].y && boids[index].y >= doors[j].y-50))
+            && (boids[index].x > width - 10 || boids[index].x < 5 || boids[index].y > height - 10 || boids[index].y < 5)){
+            boids.splice(index, 1);
+        }
+    }
     if(boids[index].x > width - 10){
         boids[index].x = width - 5;
         boids[index].v.x = Math.random() * 2 - 1;
@@ -168,15 +181,28 @@ var update = function(){
     clearCanvas();
     $('#h1').html( totalBoids );
     drawRectangle();    
+    var door = new Door(width-750, height, 'H');
+    doors.push(door);
+    door = new Door(width-50, height, 'H');
+    doors.push(door);
+    door = new Door(width, height-250, 'V');
+    doors.push(door);
+    
 
     for(var j=0; j< obstacles.length; j++){
         obstacles[j].draw(ctx);
+    }
+
+    for(var j=0; j< doors.length; j++){
+        doors[j].draw(ctx);
     }
 
     for (var i = 0; i < boids.length; i++) {
 
         //Draw boid
         ctx.beginPath();
+        ctx.strokeStyle = "black";  
+        ctx.lineWidth = "1";
         ctx.fillStyle = boids[i].c;
 
         var oldx=boids[i].x, oldy=boids[i].y;
@@ -190,7 +216,7 @@ var update = function(){
         dy=boids[i].v.y;
 
         for (var j = 0; j < obstacles.length; j++){
-            if (calculateDistance(boids[i], obstacles[j]) < 40) {
+            if (calculateDistance(boids[i], obstacles[j]) < 50) {
                 var dx=boids[i].v.x * speed, dy=boids[i].v.y * speed;
                 boids[i].x -= dx;
                 boids[i].y -= dy;
@@ -219,6 +245,7 @@ var clearCanvas = function(){
     ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
     ctx.beginPath();
     ctx.rect(0, 0, window.innerWidth , window.innerHeight );
+    doors = [];
     ctx.closePath();
     ctx.fill();
 };
@@ -278,6 +305,30 @@ function Obstacle(x, y, rad) {
         ctx.fill();
         ctx.restore();
     };
+}
+
+//creating Door
+function Door(x,y,type){
+    this.x = x;
+    this.y = y;
+    this.type = type;
+
+    this.draw = function(ctx){
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = "#FF0000";
+        ctx.lineWidth = "10"
+        ctx.moveTo(x,y);
+        if(type == 'H'){
+            ctx.lineTo(x-50,y);
+
+        }else if(type == 'V'){
+            ctx.lineTo(x,y-50);
+        }
+        ctx.closePath();
+        ctx.stroke();
+    };
+
 }
 
 //watch out for the mouse!
