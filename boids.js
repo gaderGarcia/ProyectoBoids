@@ -190,7 +190,7 @@ var update = function(){
         dy=boids[i].v.y;
 
         for (var j = 0; j < obstacles.length; j++){
-            if (calculateDistance(boids[i], obstacles[j]) < 40) {
+            if (calculateDistance(boids[i], obstacles[j]) < 50) {
                 var dx=boids[i].v.x * speed, dy=boids[i].v.y * speed;
                 boids[i].x -= dx;
                 boids[i].y -= dy;
@@ -244,6 +244,13 @@ $('html').keyup(function(e){
         if(width<15)
             width = window.innerWidth - 100;
         if(height<15)
+            height = window.innerHeight - 100;
+    } else if(code == 40){
+        width +=5;
+        height+=5;
+        if(width > window.innerWidth)
+            width = window.innerWidth - 100;
+        if(height > window.innerHeight)
             height = window.innerHeight - 100;
     }
     
