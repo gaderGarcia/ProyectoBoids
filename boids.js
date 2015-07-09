@@ -2,6 +2,8 @@
 var width = window.innerWidth - 100, height = window.innerHeight - 100, timerID = 0, c2 = document.getElementById('c'), ctx = c2.getContext('2d');
 c2.width = width;
 c2.height = height;
+var emergencyInterval;
+var isEmergency = false;
 
 var speed = 6;
 var boids = [];
@@ -226,6 +228,26 @@ var update = function(){
             }
         }
 
+        //iterate doors to be defined since we are not approaching to the exit
+        
+        /*if(isEmergency)
+        {
+            var minDistDoor = 100;
+            for (var j = 0; j < doors.length; j++){
+                var dist = calculateDistance(boids[i], doors[j]);
+                if ( dist < minDistDoor) {
+                    minDistDoor = dist;
+                }
+            }
+            var dx=boids[i].v.x * speed, dy=boids[i].v.y * speed;
+            boids[i].x += dx;
+            boids[i].y += dy;
+            boids[i].v.x = Math.random() * 2 - 1;
+            boids[i].v.y = Math.random() * 2 - 1;
+            applyForces(i);
+        }*/
+        
+
         ctx.moveTo(oldx+dx, oldy+dy);
         ctx.lineTo(oldx-dy, oldy+dx);
         ctx.lineTo(boids[i].x, boids[i].y);
@@ -280,20 +302,6 @@ $('html').keyup(function(e){
         if(height > window.innerHeight)
             height = window.innerHeight - 100;
     }
-    
-    /*var code = e.keyCode;
-    if (code == 38){
-        speed = speed + 1;
-    }
-    else if (code == 40){
-        speed = speed - 1;
-    }
-    else if (code == 32){
-        for (var i = 0; i < totalBoids; i++) {
-           boids[i].v.x = Math.random() * 2 - 1;
-           boids[i].v.y = Math.random() * 2 - 1;
-       }
-   }*/
 });
 
 //creating Obstacle
@@ -338,9 +346,29 @@ function Door(x,y,type){
 
 }
 
+function emergency(){
+    isEmergency = true;
+    emergencyInterval = setInterval(reduceStage,1000);
+}
+
+var reduceStage = function(){
+    width -=5;
+    height-=5;
+    if(width<15 || height<15)
+        return;
+};
+
+function resetStage(){
+    width = window.innerWidth - 100;
+    height = window.innerHeight - 100;
+    c2.width = width;
+    c2.height = height;
+    isEmergency = false;
+    clearInterval(emergencyInterval);
+}
+
+
 //watch out for the mouse!
-
-
 function findPos(obj) {
     var curleft = 0, curtop = 0;
     if (obj.offsetParent) {
