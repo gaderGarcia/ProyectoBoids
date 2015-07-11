@@ -59,7 +59,7 @@ function getMousePos(canvas, evt) {
 
 var checkWallCollisions = function(index){
     for(var j=0; j< doors.length; j++){
-        if(((boids[index].y >= doors[j].y-5 && doors[j].type == 'H' && boids[index].x <= doors[j].x && boids[index].x >= doors[j].x-50) 
+        if(((boids[index].y >= doors[j].y-5 && doors[j].type == 'H' && boids[index].x <= doors[j].x && boids[index].x >= doors[j].x-50)
             || (boids[index].x >= doors[j].x-5 && doors[j].type == 'V' && boids[index].y <= doors[j].y && boids[index].y >= doors[j].y-50))
             && (boids[index].x > width - 10 || boids[index].x < 5 || boids[index].y > height - 10 || boids[index].y < 5)){
             boids.splice(index, 1);
@@ -70,28 +70,28 @@ var checkWallCollisions = function(index){
         boids[index].v.x = Math.random() * 2 - 1;
         boids[index].v.y = Math.random() * 2 - 1;
         applyForces(index);
-        
+
     }
     if(boids[index].x < 5){
         boids[index].x =  5;
         boids[index].v.x = Math.random() * 2 - 1;
         boids[index].v.y = Math.random() * 2 - 1;
         applyForces(index);
-        
+
     }
     if(boids[index].y > height - 10){
         boids[index].y = height - 5;
         boids[index].v.x = Math.random() * 2 - 1;
         boids[index].v.y = Math.random() * 2 - 1;
         applyForces(index);
-        
+
     }
     if(boids[index].y < 5){
         boids[index].y =  5;
         boids[index].v.x = Math.random() * 2 - 1;
         boids[index].v.y = Math.random() * 2 - 1;
         applyForces(index);
-        
+
     }
 };
 
@@ -155,7 +155,7 @@ var applyForces = function(index){
             }
         }
     }
-    
+
     if (count > 0) {
         percievedCenter.x = percievedCenter.x / count;
         percievedCenter.y = percievedCenter.y / count;
@@ -182,14 +182,14 @@ var update = function(){
 
     clearCanvas();
     $('#h1').html( totalBoids );
-    drawRectangle();    
+    drawRectangle();
     var door = new Door(width-750, height, 'H');
     doors.push(door);
     door = new Door(width-50, height, 'H');
     doors.push(door);
     door = new Door(width, height-250, 'V');
     doors.push(door);
-    
+
 
     for(var j=0; j< obstacles.length; j++){
         obstacles[j].draw(ctx);
@@ -203,7 +203,7 @@ var update = function(){
 
         //Draw boid
         ctx.beginPath();
-        ctx.strokeStyle = "black";  
+        ctx.strokeStyle = "black";
         ctx.lineWidth = "1";
         ctx.fillStyle = boids[i].c;
 
@@ -229,24 +229,36 @@ var update = function(){
         }
 
         //iterate doors to be defined since we are not approaching to the exit
-        
-        /*if(isEmergency)
+
+        if(isEmergency)
         {
-            var minDistDoor = 100;
+            var minDistDoor = 1000;
+            var indexDoor = 0;
             for (var j = 0; j < doors.length; j++){
                 var dist = calculateDistance(boids[i], doors[j]);
                 if ( dist < minDistDoor) {
                     minDistDoor = dist;
+                    indexDoor = j;
                 }
             }
-            var dx=boids[i].v.x * speed, dy=boids[i].v.y * speed;
+            var center = {
+                x : doors[indexDoor].x,
+                y : doors[indexDoor].y
+            };
+
+            center.x = (center.x- boids[i].x) / 400;
+            center.y = (center.y- boids[i].y) / 400;
+
+            addForce(i,center);
+
+            /*var dx=boids[i].v.x * speed, dy=boids[i].v.y * speed;
             boids[i].x += dx;
             boids[i].y += dy;
             boids[i].v.x = Math.random() * 2 - 1;
             boids[i].v.y = Math.random() * 2 - 1;
-            applyForces(i);
-        }*/
-        
+            applyForces(i);*/
+        }
+
 
         ctx.moveTo(oldx+dx, oldy+dy);
         ctx.lineTo(oldx-dy, oldy+dx);
